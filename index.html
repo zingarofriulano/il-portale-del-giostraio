@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1769e8">
+<title>Il Portale del Giostraio</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app-shell">
+<header class="topbar">
+  <button class="icon-btn" id="menuBtn" aria-label="Menu">☰</button>
+  <div class="brand"><span class="brand-mark">🎡</span><span><b>IL PORTALE</b><small>DEL GIOSTRAIO</small></span></div>
+  <button class="icon-btn" id="profileTop" aria-label="Profilo">♙</button>
+</header>
+
+<main id="view-home" class="view active">
+  <section class="hero">
+    <div class="hero-copy"><span class="eyebrow">IL MERCATO DELLO SPETTACOLO VIAGGIANTE</span>
+      <h1>La tua piazza,<br><em>il tuo mondo.</em></h1>
+      <p>Compra, vendi e cerca tutto quello che serve al mondo dei giostrai.</p>
+    </div>
+    <div class="wheel-stage" aria-label="Ruota panoramica con categorie">
+      <div class="wheel-glow"></div>
+      <div class="wheel">
+        <div class="spokes"></div><div class="hub">🎪</div>
+        <button class="cabin cabin-blue" data-category="Abitazioni"><span>⌂</span><b>ABITAZIONI</b><small>🚐</small></button>
+        <button class="cabin cabin-red" data-category="Giostre"><span>🎠</span><b>GIOSTRE</b></button>
+        <button class="cabin cabin-gold" data-category="Attrezzature"><span>⚒</span><b>ATTREZZATURE</b></button>
+        <button class="cabin cabin-green" data-category="Cerco"><span>⌕</span><b>CERCO</b></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-wrap">
+    <label class="searchbar"><span>⌕</span><input id="globalSearch" placeholder="Cerca annunci (es. camper, giostra, ricambi…)"><button id="searchBtn">Cerca</button></label>
+    <div class="quick-actions">
+      <button class="quick-card purple" data-go="publish"><span>＋</span><b>Pubblica<br>annuncio</b></button>
+      <button class="quick-card blue" data-go="messages"><span>▢</span><b>I miei<br>messaggi</b></button>
+      <button class="quick-card pink" data-go="favorites"><span>♡</span><b>Preferiti</b></button>
+      <button class="quick-card navy" data-go="profile"><span>♙</span><b>Area<br>personale</b></button>
+    </div>
+    <div class="section-heading"><div><span class="eyebrow">DA NON PERDERE</span><h2>Ultimi annunci</h2></div><button class="text-btn" data-go="listings">Vedi tutti ›</button></div>
+    <div id="homeListings" class="listing-grid"></div>
+    <section class="callout"><div><span class="eyebrow">LA BACHECA DELLA COMUNITÀ</span><h2>Cerchi qualcosa?</h2><p>Trova personale, attrezzature, ricambi e collaborazioni.</p><button class="primary-btn" data-go="cerco">Entra in CERCO <span>→</span></button></div><div class="callout-emoji">🔎</div></section>
+  </section>
+</main>
+
+<main id="view-listings" class="view page-view">
+  <div class="page-head"><span class="eyebrow">IL MERCATINO</span><h1>Annunci in vendita</h1><p>Esplora le occasioni della comunità.</p></div>
+  <div class="filter-row"><select id="categoryFilter"><option value="">Tutte le categorie</option><option>Abitazioni</option><option>Giostre</option><option>Attrezzature</option></select><input id="listingSearch" placeholder="Cerca…"></div>
+  <div id="allListings" class="listing-grid"></div>
+</main>
+
+<main id="view-publish" class="view page-view">
+  <div class="page-head"><span class="eyebrow">VENDI NEL PORTALE</span><h1>Pubblica annuncio</h1><p>Puoi avere fino a 4 annunci attivi contemporaneamente.</p></div>
+  <div class="panel"><div class="quota"><b>I tuoi annunci attivi</b><strong id="quotaCount">0 / 4</strong></div><div class="quota-track"><i id="quotaBar"></i></div>
+  <form id="publishForm">
+    <label>Titolo<input id="adTitle" required maxlength="80" placeholder="Es. Giostra per bambini in ottime condizioni"></label>
+    <div class="form-row"><label>Categoria<select id="adCategory" required><option value="">Seleziona</option><option>Abitazioni</option><option>Giostre</option><option>Attrezzature</option></select></label><label>Sottocategoria<select id="adSub" required><option value="">Seleziona categoria</option></select></label></div>
+    <label>Prezzo in euro<input id="adPrice" type="number" min="1" required placeholder="Es. 18000"></label>
+    <label>Descrizione<textarea id="adDescription" rows="4" required placeholder="Descrivi il tuo articolo, condizioni e dettagli…"></textarea></label>
+    <label>Fotografia<input id="adPhoto" type="file" accept="image/*"></label>
+    <p class="hint">Il prezzo è obbligatorio. Potrai indicare nella descrizione se è trattabile.</p>
+    <button class="primary-btn full" type="submit">Pubblica annuncio <span>→</span></button>
+  </form></div>
+</main>
+
+<main id="view-cerco" class="view page-view">
+  <div class="page-head"><span class="eyebrow">LA BACHECA DELLA COMUNITÀ</span><h1>CERCO</h1><p>Richieste testuali per trovare persone, attrezzature e opportunità.</p></div>
+  <div class="panel composer"><textarea id="postText" rows="3" placeholder="Cosa stai cercando? Raccontalo alla comunità…"></textarea><button id="postBtn" class="primary-btn full">Pubblica richiesta</button><small>Per pubblicare devi accedere al tuo account.</small></div>
+  <div id="posts" class="post-list"></div>
+</main>
+
+<main id="view-messages" class="view page-view">
+  <div class="page-head"><span class="eyebrow">CONTATTI RISERVATI</span><h1>Messaggi</h1><p>Le conversazioni con venditori e acquirenti.</p></div>
+  <div class="empty-state"><div>💬</div><h2>Le tue chat ti aspettano</h2><p>Apri un annuncio e premi “Contatta il venditore” per iniziare una conversazione privata.</p><button class="primary-btn" data-go="listings">Scopri gli annunci</button></div>
+</main>
+
+<main id="view-favorites" class="view page-view">
+  <div class="page-head"><span class="eyebrow">I TUOI ANNUNCI SALVATI</span><h1>Preferiti</h1><p>Ritrova gli annunci che ti interessano.</p></div><div id="favoriteListings" class="listing-grid"></div>
+</main>
+
+<main id="view-profile" class="view page-view">
+  <div class="page-head"><span class="eyebrow">IL TUO SPAZIO PERSONALE</span><h1>Area personale</h1><p>Gestisci annunci, messaggi e profilo.</p></div>
+  <div class="panel profile-panel"><div class="avatar">♙</div><div><h2 id="profileName">Benvenuto!</h2><p id="profilePhone">Accedi o crea un account per iniziare.</p></div></div>
+  <div class="panel"><h2>Accedi / Registrati</h2><form id="loginForm"><label>Numero di cellulare<input id="phone" type="tel" placeholder="+39 333 1234567" required></label><label>Password<input id="password" type="password" placeholder="La tua password" required></label><button class="primary-btn full">Entra (demo)</button></form><p class="hint">Anteprima dimostrativa: l'autenticazione reale richiederà verifica SMS e backend sicuro.</p></div>
+  <div class="panel"><h2>I tuoi annunci</h2><p id="profileQuota">0 di 4 annunci attivi</p><button class="secondary-btn full" data-go="publish">＋ Pubblica un annuncio</button></div>
+</main>
+
+<nav class="tabbar">
+  <button class="tab active" data-tab="home"><span>⌂</span>Home</button>
+  <button class="tab" data-tab="listings"><span>▦</span>Categorie</button>
+  <button class="tab publish-tab" data-tab="publish"><span>＋</span>Pubblica</button>
+  <button class="tab" data-tab="messages"><span>▢</span>Messaggi</button>
+  <button class="tab" data-tab="profile"><span>♙</span>Profilo</button>
+</nav>
+</div>
+
+<div id="contactModal" class="modal"><div class="modal-card"><button class="close-modal" id="closeModal">×</button><div class="modal-icon">💬</div><h2>Contatta il venditore</h2><p>Per avviare una chat privata devi accedere al portale.</p><button class="primary-btn full" id="modalLogin">Accedi / Registrati</button></div></div>
+<div id="toast" class="toast"></div>
+<script src="app.js"></script>
+</body></html>

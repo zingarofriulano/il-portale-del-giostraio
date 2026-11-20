@@ -1,0 +1,33 @@
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const subs={Abitazioni:["Campine e carovane","Camper","Case mobili","Altre abitazioni"],Giostre:["Piccole","Medie","Grandi","Altre attrazioni"],Attrezzature:["Attrezzature","Ricambi","Impianti","Accessori"]};
+let ads=[
+{id:1,title:"Giostra per bambini",category:"Giostre",sub:"Piccole",price:18000,desc:"Giostra colorata in ottime condizioni, completa e funzionante. Prezzo trattabile.",emoji:"🎠"},
+{id:2,title:"Carovana abitativa",category:"Abitazioni",sub:"Campine e carovane",price:12500,desc:"Carovana abitativa ben tenuta, pronta all'uso. Prezzo trattabile.",emoji:"🚐"},
+{id:3,title:"Ricambi per autoscontro",category:"Attrezzature",sub:"Ricambi",price:850,desc:"Lotto di ricambi disponibili. Prezzo trattabile.",emoji:"🛠️"}
+];
+let posts=["Cerco operaio esperto per montaggio e smontaggio giostre. Disponibilità per trasferte.","Cerco ricambi per autoscontro, anche usati."],favorites=new Set(),logged=false,phone="";
+const euro=n=>new Intl.NumberFormat("it-IT",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(n);
+function show(view){$$(".view").forEach(v=>v.classList.toggle("active",v.id==="view-"+view));$$(".tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===view));window.scrollTo({top:0,behavior:"smooth"});if(view==="listings")renderListings();if(view==="favorites")renderFavorites();if(view==="profile")updateProfile();if(view==="cerco")renderPosts();}
+function toast(msg){let t=$("#toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2300)}
+function card(a){return `<article class="listing-card"><div class="listing-photo">${a.photo?`<img src="${a.photo}" alt="">`:a.emoji||"🎡"}<button class="heart" data-fav="${a.id}">${favorites.has(a.id)?"♥":"♡"}</button></div><div class="listing-info"><span class="tag">${a.category} · ${a.sub}</span><h3>${escapeHtml(a.title)}</h3><div><span class="price">${euro(a.price)}</span><span class="negotiable">Trattabile</span></div><p>${escapeHtml(a.desc)}</p><button class="contact-btn" data-contact="${a.id}">Contatta il venditore</button></div></article>`}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function bindCards(){ $$("[data-fav]").forEach(b=>b.onclick=()=>{let id=+b.dataset.fav;favorites.has(id)?favorites.delete(id):favorites.add(id);renderListings();renderHome();renderFavorites()});$$("[data-contact]").forEach(b=>b.onclick=()=>{if(!logged){$("#contactModal").classList.add("show")}else toast("Chat dimostrativa: backend da collegare")})}
+function renderHome(){$("#homeListings").innerHTML=ads.slice(0,3).map(card).join("");bindCards();updateQuota()}
+function renderListings(){let cat=$("#categoryFilter").value,q=$("#listingSearch").value.toLowerCase();let list=ads.filter(a=>(!cat||a.category===cat)&&(!q||(a.title+" "+a.desc+" "+a.sub).toLowerCase().includes(q)));$("#allListings").innerHTML=list.length?list.map(card).join(""):'<div class="empty-state"><div>🔎</div><h2>Nessun annuncio trovato</h2><p>Prova a modificare la ricerca.</p></div>';bindCards()}
+function renderFavorites(){let list=ads.filter(a=>favorites.has(a.id));$("#favoriteListings").innerHTML=list.length?list.map(card).join(""):'<div class="empty-state"><div>♡</div><h2>Nessun preferito</h2><p>Salva gli annunci che vuoi ritrovare.</p></div>';bindCards()}
+function updateQuota(){let n=ads.filter(a=>a.owner==="me").length;$("#quotaCount").textContent=n+" / 4";$("#quotaBar").style.width=(n/4*100)+"%";$("#profileQuota").textContent=n+" di 4 annunci attivi"}
+function updateProfile(){if(logged){$("#profileName").textContent="Il tuo account";$("#profilePhone").textContent=phone||"Utente registrato (demo)"}else{$("#profileName").textContent="Benvenuto!";$("#profilePhone").textContent="Accedi o crea un account per iniziare."}updateQuota()}
+function renderPosts(){$("#posts").innerHTML=posts.map((p,i)=>`<article class="post"><div class="post-head"><div class="post-avatar">♙</div><div><b>Utente del portale</b><br><small>Richiesta ${posts.length-i}</small></div></div><p>${escapeHtml(p)}</p><button class="secondary-btn full" data-reply>Rispondi in privato</button></article>`).join("");$$("[data-reply]").forEach(b=>b.onclick=()=>logged?toast("Chat dimostrativa: backend da collegare"):$("#contactModal").classList.add("show"))}
+$$("[data-tab]").forEach(b=>b.onclick=()=>show(b.dataset.tab));
+$$("[data-go]").forEach(b=>b.onclick=()=>show(b.dataset.go));
+$$("[data-category]").forEach(b=>b.onclick=()=>{show("listings");$("#categoryFilter").value=b.dataset.category;renderListings()});
+$("#profileTop").onclick=()=>show("profile");$("#menuBtn").onclick=()=>show("listings");
+$("#categoryFilter").onchange=renderListings;$("#listingSearch").oninput=renderListings;
+$("#searchBtn").onclick=()=>{show("listings");$("#listingSearch").value=$("#globalSearch").value;renderListings()};
+$("#globalSearch").addEventListener("keydown",e=>{if(e.key==="Enter")$("#searchBtn").click()});
+$("#adCategory").onchange=e=>{$("#adSub").innerHTML='<option value="">Seleziona</option>'+(subs[e.target.value]||[]).map(s=>`<option>${s}</option>`).join("")};
+$("#publishForm").onsubmit=async e=>{e.preventDefault();if(!logged){toast("Accedi prima di pubblicare");show("profile");return}if(ads.filter(a=>a.owner==="me").length>=4){toast("Hai raggiunto il limite di 4 annunci");return}let file=$("#adPhoto").files[0],photo=file?await new Promise(res=>{let r=new FileReader();r.onload=()=>res(r.result);r.readAsDataURL(file)}):null;ads.unshift({id:Date.now(),title:$("#adTitle").value,category:$("#adCategory").value,sub:$("#adSub").value,price:+$("#adPrice").value,desc:$("#adDescription").value,photo,emoji:"🎡",owner:"me"});e.target.reset();$("#adSub").innerHTML='<option value="">Seleziona categoria</option>';renderHome();toast("Annuncio pubblicato in questa demo");show("profile")};
+$("#loginForm").onsubmit=e=>{e.preventDefault();phone=$("#phone").value;logged=true;toast("Accesso demo effettuato");updateProfile()};
+$("#postBtn").onclick=()=>{if(!logged){toast("Accedi per pubblicare una richiesta");show("profile");return}let p=$("#postText").value.trim();if(!p)return;posts.unshift(p);$("#postText").value="";renderPosts();toast("Richiesta pubblicata")};
+$("#closeModal").onclick=()=>$("#contactModal").classList.remove("show");$("#modalLogin").onclick=()=>{$("#contactModal").classList.remove("show");show("profile")};
+renderHome();renderPosts();
